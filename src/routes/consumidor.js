@@ -4,10 +4,8 @@ const router = Router()
 
 const consumidorController = require('../controller/consumidorController')
 
-router.get('/Adicionar', consumidorController.inserirUsuario)
-router.get('/Remover', consumidorController.removerUsuario)
-router.get('/Atualizar', consumidorController.atualizarUsuario)
-router.get('/Pesquisar', consumidorController.pesquisarUsuario)
-
+router.post('/Adicionar', consumidorController.inserirUsuario)
+router.delete('/Remover', consumidorController.removerUsuario)
+router.put('/Atualizar', consumidorController.atualizarUsuario)
 
 module.exports = router;
