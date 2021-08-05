@@ -1,7 +1,7 @@
 
 const { Schema, model } = require('../database/conexao')
 
-const userSchema = new Schema({//Criando a estrutura do documento 
+const usuarioSchema = new Schema({//Criando a estrutura do documento
 
     cpfCnpj: {
         type: String,
@@ -22,7 +22,7 @@ const userSchema = new Schema({//Criando a estrutura do documento
     senha: {
         type: String,
         required: true
-    }, 
+    },
     saldo: {
         type: Number,
         default: 0
@@ -32,7 +32,7 @@ const userSchema = new Schema({//Criando a estrutura do documento
         default: true //As contas inicialmente são ativas, por isso o true : )
     },
     tipo: {
-        type: String, 
+        type: String,
         required: true
     },
     uf: {
@@ -43,7 +43,7 @@ const userSchema = new Schema({//Criando a estrutura do documento
     },
     bairro: {
         type: String
-    }, 
+    },
     rua: {
         type: String
     },
@@ -61,13 +61,13 @@ const userSchema = new Schema({//Criando a estrutura do documento
     },
     cupons: {
         type: Array
-    }, 
+    },
     doacoes: {
         type: Array
     }
 
 })
 
-const Usuario = model('Usuario', userSchema) //Criando a coleção 
+const Usuario = model('Usuario', usuarioSchema) //Criando a coleção
 
 module.exports = Usuario;

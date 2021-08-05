@@ -3,12 +3,13 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const mongoose = require('./database/conexao')
-const rotasConsumidor = require('./routes/consumidor')
+const rotasUsuario = require('./routes/rotasUsuario')
+//const rotasCupom = require('./routes/rotasCupom')
 
 app.use(express.json()) //Habilitando o uso de arquivos no formato JSON
 
-//Rotar relacionadas ao usuários consumidor 
-app.use('/Consumidor', rotasConsumidor) // -> /Consumidor é o prefixo da rota
+app.use('/usuario', rotasUsuario) // -> Usuário é o prefixo da rota
+//app.use('/cupom', rotasCupom)
 
 
 app.listen(
