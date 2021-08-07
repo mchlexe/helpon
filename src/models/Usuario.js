@@ -37,7 +37,7 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
         required: true
     },
     uf: {
-        type: String
+        type: String 
     },
     cidade: {
         type: String
