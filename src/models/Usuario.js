@@ -7,6 +7,9 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
         type: String,
         required: true
     },
+    fotoPerfil: {
+        type: String
+    },
     nome: {
         type: String,
         required: true

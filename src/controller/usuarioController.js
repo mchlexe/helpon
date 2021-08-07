@@ -6,6 +6,7 @@ const inserirUsuario = (req, res) => {
 
     let novoUsuario = {
         cpfCnpj: req.body.cpfCnpj,
+        fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
         nome: req.body.nome,
         telefone: req.body.telefone,
         email: req.body.email,
@@ -13,7 +14,7 @@ const inserirUsuario = (req, res) => {
         tipo: req.body.tipo
     }
 
-    if ( ['Comércio', 'Instutição'].includes(req.body.tipo) ) {
+    if ( ['Comércio', 'Instituição'].includes(req.body.tipo) ) {
 
         //campos de endereço
         novoUsuario['cidade'] = ''

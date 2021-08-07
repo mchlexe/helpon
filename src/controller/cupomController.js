@@ -3,51 +3,54 @@ const { response } = require('express')
 const Cupom = require('../models/Cupom')
 const Usuario = require('../models/Usuario')
 
-const inserirCupom = (req, res) => {
+const verificar = async (cnpj, tipo) => { 
 
-    const novoCupom = {
-        autor: req.body.autor,
-        instituicaoAlvo: req.body.instituicao,
-        data_validade: req.body.data_validade,
-        descricao: req.body.descricao,
-        valor_doado: req.body.valor_doado,
-        valor: req.body.valor
+    const user = await Usuario.findOne({cpfCnpj: cnpj});
+
+    if ( user ) {
+        return user.tipo == tipo
     }
+    
+    return false //Se o usuário não existir, o retorno é false :)
 
-    //Tentei fazer a validação do autor e da instituição mas ficou zuado help pls
-    // Usuario.findOne({ cpfCnpj: req.body.autor })
-    //     .then((autor, err) => {
-    //         if (err) throw err;
-    //         console.log(autor.cpfCnpj);
-    //         if (autor.tipo == 'Comércio') {
-    //             usuario_autor = autor.cpfCnpj;
-    //         }
-    //     }). catch((err) => {
-    //         res.status(400).json({erro: err, message: 'Falha interna ao definir autor'})
-    //     });
+}
 
-    // Usuario.findOne({ cpfCnpj: req.body.instituicaoAlvo })
-    //     .then((instituicao, err) => {
-    //         if (err) throw err;
-    //         if (instituicao.tipo == 'Instituição') {
-    //             usuario_instituicao = instituicao.cpfCnpj;
-    //         }
-    //         else res.status(400).json('Instituição inválida');
-    //     }). catch((err) => {
-    //         //res.status(500).json({erro: err, message: 'Falha interna ao definir instituição'})
-    //     });
+const inserirCupom = async (req, res) => {
 
-    new Cupom(novoCupom)
-        .save()
-        .then(() => {
-            res.status(200).json({ message: 'Cupom inserido com sucesso!' })
-        })
-        .catch((err) => {
-            res.status(400).json({
-                erro: err
+    if ( await verificar(req.body.instituicaoAlvo, 'Instituição') && await verificar(req.body.autor, 'Comércio')) {
+
+        const autor = await Usuario.findOne({cpfCnpj: req.body.autor})
+        const instituicaoAlvo = await Usuario.findOne({cpfCnpj: req.body.instituicaoAlvo})
+        
+        const novoCupom = {
+
+            autor: autor._id,
+            instituicaoAlvo: instituicaoAlvo._id,
+            data_validade: req.body.data_validade,
+            descricao: req.body.descricao,
+            valor_doado: req.body.valor_doado,
+            valor: req.body.valor
+
+        }
+
+        new Cupom(novoCupom)
+            .save()
+            .then(() => {
+                res.status(200).json({message: 'Cupom inserido com sucesso !'})
             })
-        })
+            .catch((err) => {
+                res.status(400).json({error: err})
+            })
 
+        
+    } else {
+        res.status(400).json(
+            {
+                message: 'Erro, o autor ou instituição alvo são invalidos !'
+            }
+        )
+    }
+    
 }
 
 const atualizarCupom = (req, res) => { //serve para remover o cupom {"status": "false"}
@@ -85,7 +88,7 @@ const atualizarCupom = (req, res) => { //serve para remover o cupom {"status": "
 
 const listarCupons = (req, res) => {
 
-    Cupom.find(req.body).lean()
+    Cupom.find(req.body).lean() 
         .then((cupons) => {
             return res.end(JSON.stringify(cupons))
         }).catch((err) => {
