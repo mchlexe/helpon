@@ -33,6 +33,7 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
     },
     tipo: {
         type: String,
+        enum: {values: ['Consumidor', 'Instituição', 'Comércio'], message: '{VALUE} não é um tipo válido!'},
         required: true
     },
     uf: {
