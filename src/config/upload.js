@@ -8,7 +8,7 @@ module.exports = {
 
         destination: join(__dirname, '../../uploads'), //Definindo a pasta onde os arquivos serão armazenados
         filename: (req, file, cb) => {
-            const fileName = `${Date.now()}-${new Date().toLocaleTimeString()}-${file.originalname.trim()}` //Nomeclatura dos arquivos
+            const fileName = `${Date.now()}-${file.originalname.trim()}` //Nomeclatura dos arquivos
             cb(null, fileName)
         }
        
