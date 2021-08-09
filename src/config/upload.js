@@ -11,7 +11,7 @@ module.exports = {
             const fileName = `${Date.now()}-${file.originalname.trim()}` //Nomeclatura dos arquivos
             cb(null, fileName)
         }
-       
+
     })
 
 }

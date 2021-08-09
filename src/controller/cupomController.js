@@ -3,14 +3,14 @@ const { response } = require('express')
 const Cupom = require('../models/Cupom')
 const Usuario = require('../models/Usuario')
 
-const verificar = async (cnpj, tipo) => { 
+const verificar = async (cnpj, tipo) => {
 
     const user = await Usuario.findOne({cpfCnpj: cnpj});
 
     if ( user ) {
         return user.tipo == tipo
     }
-    
+
     return false //Se o usuário não existir, o retorno é false :)
 
 }
@@ -21,7 +21,7 @@ const inserirCupom = async (req, res) => {
 
         const autor = await Usuario.findOne({cpfCnpj: req.body.autor})
         const instituicaoAlvo = await Usuario.findOne({cpfCnpj: req.body.instituicaoAlvo})
-        
+
         const novoCupom = {
 
             autor: autor._id,
@@ -42,7 +42,7 @@ const inserirCupom = async (req, res) => {
                 res.status(400).json({error: err})
             })
 
-        
+
     } else {
         res.status(400).json(
             {
@@ -50,7 +50,7 @@ const inserirCupom = async (req, res) => {
             }
         )
     }
-    
+
 }
 
 const atualizarCupom = (req, res) => { //serve para remover o cupom {"status": "false"}
@@ -88,7 +88,7 @@ const atualizarCupom = (req, res) => { //serve para remover o cupom {"status": "
 
 const listarCupons = (req, res) => {
 
-    Cupom.find(req.body).lean() 
+    Cupom.find(req.body).lean()
         .then((cupons) => {
             return res.end(JSON.stringify(cupons))
         }).catch((err) => {

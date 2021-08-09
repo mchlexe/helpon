@@ -20,7 +20,8 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     senha: {
         type: String,
@@ -40,7 +41,7 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
         required: true
     },
     uf: {
-        type: String 
+        type: String
     },
     cidade: {
         type: String

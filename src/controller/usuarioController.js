@@ -1,6 +1,7 @@
 
 const { response } = require('express')
 const Usuario = require('../models/Usuario')
+const Cupom = require('../models/Cupom')
 
 const inserirUsuario = (req, res) => {
 
@@ -10,7 +11,7 @@ const inserirUsuario = (req, res) => {
         nome: req.body.nome,
         telefone: req.body.telefone,
         email: req.body.email,
-        senha: req.body.senha, 
+        senha: req.body.senha,
         tipo: req.body.tipo
     }
 
@@ -23,11 +24,11 @@ const inserirUsuario = (req, res) => {
         novoUsuario['rua'] = ''
         novoUsuario['numero'] = ''
         novoUsuario['complemento'] = ''
-       
+
         if ( req.body.tipo == 'Instituição' ) {
             novoUsuario['descricao'] =  ''
         }
-        
+
         if ( req.body.tipo == 'Comércio' ) {
             novoUsuario['ramo'] = ''
         }
@@ -92,12 +93,43 @@ const removerUsuario = (req, res) => {
 }
 
 
+
 const atualizarUsuario = (req, res) => {
+
+
 
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
             if (user) {
+
+                if(req.body['cupons']){
+                    // comprar
+                    // {
+                    //     "cpfCnpj": "12312",
+                    //     "cupons": {"id": 12,"status": true}
+                    // }
+                    // { utilizar
+                    //     "cpfCnpj": "12312",
+                    //     "cupons": {"id": 12,"status": true}
+                    // }
+                    user['cupons'].forEach((element) => {
+                        if (element['id'] == req.body['cupons'].id) {
+                            if (req.body['cupons'].status == false) {
+                                element['status'] = false
+                                req.body['cupons'] = ''
+                            } else {
+                                err = {"400": "Usuário já comprou cupom"};
+                                throw err;
+                            }
+                        }
+                        else {
+                        }
+                     })
+
+                    string_cupons = user['cupons'].concat(req.body['cupons'])
+                    req.body['cupons'] = string_cupons
+                }
 
                 Usuario.updateOne({ cpfCnpj: req.body.cpfCnpj }, req.body)
                     .then(() => {
@@ -134,6 +166,8 @@ const listarUsuarios = (req, res) => {
             })
         })
 }
+
+
 
 
 module.exports = {

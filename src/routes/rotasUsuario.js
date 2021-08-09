@@ -4,7 +4,7 @@ const router = Router()
 const uploadConfig = require('../config/upload')
 const multer = require('multer')
 
-const upload = multer(uploadConfig) 
+const upload = multer(uploadConfig)
 
 const usuarioController = require('../controller/usuarioController')
 
