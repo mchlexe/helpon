@@ -3,6 +3,18 @@ const { response } = require('express')
 const Usuario = require('../models/Usuario')
 const Cupom = require('../models/Cupom')
 
+const yup = require('yup')
+
+let schema = yup.object().shape({
+    cpfCnpj: yup.string().required(),
+    fotoPerfil: yup.string().required(),
+    nome: yup.string().required(),
+    telefone: yup.string().required(),
+    email: yup.string().email().required(),
+    senha: yup.string().required(),
+    tipo: yup.string().required()
+})
+
 const inserirUsuario = (req, res) => {
 
     let novoUsuario = {
@@ -34,6 +46,16 @@ const inserirUsuario = (req, res) => {
         }
     }
 
+    schema.isValid({
+        cpfCnpj: req.body.cpfCnpj,
+        fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
+        nome: req.body.nome,
+        telefone: req.body.telefone,
+        email: req.body.email,
+        senha: req.body.senha, 
+        tipo: req.body.tipo
+    }).then(function (valid) {
+        if(valid){
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
@@ -59,6 +81,10 @@ const inserirUsuario = (req, res) => {
                 erro: err
             })
         })
+    }else{
+        res.send("Preencha todo o formulário")
+    }
+})
 }
 
 
