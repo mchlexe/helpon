@@ -13,5 +13,6 @@ router.post('/inserir', upload.single('profilePicture'), usuarioController.inser
 router.delete('/remover', usuarioController.removerUsuario)
 router.put('/atualizar', usuarioController.atualizarUsuario)
 router.get('/listar', usuarioController.listarUsuarios)
+router.post('/login', usuarioController.loginUsuarios)
 
 module.exports = router;

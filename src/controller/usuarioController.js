@@ -3,6 +3,8 @@ const { response } = require('express')
 const Usuario = require('../models/Usuario')
 const Cupom = require('../models/Cupom')
 
+const jwt = require('jsonwebtoken')
+const SECRET = 'helpontolls';
 const yup = require('yup')
 
 let schema = yup.object().shape({
@@ -121,9 +123,7 @@ const removerUsuario = (req, res) => {
 
 
 const atualizarUsuario = (req, res) => {
-
-
-
+    vecificajwt();
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
@@ -181,7 +181,14 @@ const atualizarUsuario = (req, res) => {
 }
 
 const listarUsuarios = (req, res) => {
+    //parte para verificar a autenticidade do token
+    const token = req.headers['x-access-token'];
+    
+    jwt.verify(token, SECRET, (err, decoded) => {
+        if(err) return res.status(401).json({ message: 'Token inválido' }).end;
 
+        req.userId = decoded.userId;
+    })
     Usuario.find(req.body).lean()
         .then((usuarios) => {
             return res.end(JSON.stringify(usuarios))
@@ -193,12 +200,35 @@ const listarUsuarios = (req, res) => {
         })
 }
 
-
+const loginUsuarios =(req, res) =>{
+    const login = {
+        email: req.body.email,
+        senha: req.body.senha,
+    }
+    Usuario.findOne({email: req.body.email })
+        .then((user) => {
+           if (login.senha == user.senha){
+               const token = jwt.sign({userId: user._id}, SECRET, { expiresIn:14400})
+               return res.json({auth: true, token});
+            }
+            else{
+                res.status(401).json({ message: 'Senha incorreta!' });
+            }
+        }
+        ).catch((err) => {
+            res.status(500).json({
+                erro: err,
+                message: 'Email não cadastrado!'
+            })
+        })
+        
+}
 
 
 module.exports = {
     inserirUsuario,
     removerUsuario,
     atualizarUsuario,
-    listarUsuarios
+    listarUsuarios,
+    loginUsuarios
 }
