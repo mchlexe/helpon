@@ -2,6 +2,17 @@ var mongoose = require('mongoose');
 const { response } = require('express')
 const Cupom = require('../models/Cupom')
 const Usuario = require('../models/Usuario')
+const yup = require('yup')
+
+// Schema de validação
+let schema = yup.object().shape({
+    autor: yup.string().required(),
+    instituicaoAlvo: yup.string().required(),
+    data_validade: yup.date().required(),
+    descricao: yup.string().required(),
+    valor_doado: yup.number().required(),
+    valor: yup.number().required(),
+})
 
 const verificar = async (cnpj, tipo) => {
 
@@ -33,14 +44,30 @@ const inserirCupom = async (req, res) => {
 
         }
 
-        new Cupom(novoCupom)
-            .save()
-            .then(() => {
-                res.status(200).json({message: 'Cupom inserido com sucesso !'})
-            })
-            .catch((err) => {
-                res.status(400).json({error: err})
-            })
+        // Validando campos
+        schema.isValid({
+            autor: autor._id,
+            instituicaoAlvo: instituicaoAlvo._id,
+            data_validade: req.body.data_validade,
+            descricao: req.body.descricao,
+            valor_doado: req.body.valor_doado,
+            valor: req.body.valor
+        }).then(function(valid) {
+            if(valid){
+
+                new Cupom(novoCupom)
+                    .save()
+                    .then(() => {
+                        res.status(200).json({message: 'Cupom inserido com sucesso !'})
+                    })
+                    .catch((err) => {
+                        res.status(400).json({error: err})
+                    })
+            }
+            else{
+                res.send("Preencha todo o formulário")
+            }
+        })
 
 
     } else {
