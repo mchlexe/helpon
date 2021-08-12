@@ -2,9 +2,10 @@
 const { response } = require('express')
 const Usuario = require('../models/Usuario')
 const Cupom = require('../models/Cupom')
+const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
-const SECRET = 'helpontolls';
+const SECRET = 'helpontolls'
 const yup = require('yup')
 const axios = require('axios').default
 
@@ -18,38 +19,8 @@ let schema = yup.object().shape({
     tipo: yup.string().required()
 })
 
+
 const inserirUsuario = (req, res) => {
-
-    let novoUsuario = {
-        cpfCnpj: req.body.cpfCnpj,
-        fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
-        nome: req.body.nome,
-        telefone: req.body.telefone,
-        email: req.body.email,
-        senha: req.body.senha,
-        tipo: req.body.tipo
-    }
-
-    if ( ['Comércio', 'Instituição'].includes(req.body.tipo) ) {
-
-        //campos de endereço
-        novoUsuario['cidade'] = ''
-        novoUsuario['uf'] = ''
-        novoUsuario['bairro'] = ''
-        novoUsuario['rua'] = ''
-        novoUsuario['numero'] = ''
-        novoUsuario['complemento'] = ''
-        novoUsuario['latitude'] = ''
-        novoUsuario['longitude'] = ''
-
-        if ( req.body.tipo == 'Instituição' ) {
-            novoUsuario['descricao'] =  ''
-        }
-
-        if ( req.body.tipo == 'Comércio' ) {
-            novoUsuario['ramo'] = ''
-        }
-    }
 
     schema.isValid({
         cpfCnpj: req.body.cpfCnpj,
@@ -57,7 +28,7 @@ const inserirUsuario = (req, res) => {
         nome: req.body.nome,
         telefone: req.body.telefone,
         email: req.body.email,
-        senha: req.body.senha, 
+        senha: req.body.senha,
         tipo: req.body.tipo
     }).then(function (valid) {
         if(valid){
@@ -69,6 +40,41 @@ const inserirUsuario = (req, res) => {
             }
 
             else {
+
+                const hash = bcrypt.hashSync(req.body.senha, 10);
+                //await hashPassword(req.body.senha)
+
+                let novoUsuario = {
+                    cpfCnpj: req.body.cpfCnpj,
+                    fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
+                    nome: req.body.nome,
+                    telefone: req.body.telefone,
+                    email: req.body.email,
+                    senha: hash,
+                    tipo: req.body.tipo
+                }
+
+                if ( ['Comércio', 'Instituição'].includes(req.body.tipo) ) {
+
+                    //campos de endereço
+                    novoUsuario['cidade'] = ''
+                    novoUsuario['uf'] = ''
+                    novoUsuario['bairro'] = ''
+                    novoUsuario['rua'] = ''
+                    novoUsuario['numero'] = ''
+                    novoUsuario['complemento'] = ''
+                    novoUsuario['latitude'] = ''
+                    novoUsuario['longitude'] = ''
+
+                    if ( req.body.tipo == 'Instituição' ) {
+                        novoUsuario['descricao'] =  ''
+                    }
+
+                    if ( req.body.tipo == 'Comércio' ) {
+                        novoUsuario['ramo'] = ''
+                    }
+                }
+
                 new Usuario(novoUsuario)
                     .save()
                     .then(() => {
@@ -122,7 +128,6 @@ const removerUsuario = (req, res) => {
         })
 
 }
-
 
 
 const atualizarUsuario = (req, res) => {
@@ -186,7 +191,7 @@ const atualizarUsuario = (req, res) => {
 const listarUsuarios = (req, res) => {
     //parte para verificar a autenticidade do token
     const token = req.headers['x-access-token'];
-    
+
     jwt.verify(token, SECRET, (err, decoded) => {
         if(err) return res.status(401).json({ message: 'Token inválido' }).end;
 
@@ -210,7 +215,9 @@ const loginUsuarios =(req, res) =>{
     }
     Usuario.findOne({email: req.body.email })
         .then((user) => {
-           if (login.senha == user.senha){
+            //bcrypt.compareSync(password, hash);
+            //login.senha == user.senha
+           if (bcrypt.compareSync(login.senha, user.senha)){
                const token = jwt.sign({userId: user._id}, SECRET, { expiresIn:14400})
                return res.json({auth: true, token});
             }
@@ -224,10 +231,10 @@ const loginUsuarios =(req, res) =>{
                 message: 'Email não cadastrado!'
             })
         })
-        
+
 }
 
-//Função para recuperar as coordenadas de um usuário com base no seu endereço 
+//Função para recuperar as coordenadas de um usuário com base no seu endereço
 const getCoordenadas = async (numero, rua, cidade, uf) => {
 
     try {
@@ -246,7 +253,7 @@ const getCoordenadas = async (numero, rua, cidade, uf) => {
                 }
             }
         )
-        
+
         if (data) { //Se o endereço for localizado, retona as coordenadas, se não, retorna um array vazio
             return (data.length > 0) ? [data[0].lat, data[0].lon] : []
         }
@@ -265,10 +272,10 @@ const atribuirCoordenadas = async (req, res) => {
     if ( user && ['Instituição', 'Comércio'].includes(user.tipo) ) {
 
         const coordenadas = await getCoordenadas(
-            req.body.numero, 
-            req.body.rua, 
-            req.body.cidade, 
-            req.body.uf, 
+            req.body.numero,
+            req.body.rua,
+            req.body.cidade,
+            req.body.uf,
         )
 
         if ( coordenadas.length > 0 ) { //Verificando se o endereço foi passado corretamente
