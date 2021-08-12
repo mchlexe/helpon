@@ -6,6 +6,7 @@ const Cupom = require('../models/Cupom')
 const jwt = require('jsonwebtoken')
 const SECRET = 'helpontolls';
 const yup = require('yup')
+const axios = require('axios').default
 
 let schema = yup.object().shape({
     cpfCnpj: yup.string().required(),
@@ -38,6 +39,8 @@ const inserirUsuario = (req, res) => {
         novoUsuario['rua'] = ''
         novoUsuario['numero'] = ''
         novoUsuario['complemento'] = ''
+        novoUsuario['latitude'] = ''
+        novoUsuario['longitude'] = ''
 
         if ( req.body.tipo == 'Instituição' ) {
             novoUsuario['descricao'] =  ''
@@ -224,11 +227,87 @@ const loginUsuarios =(req, res) =>{
         
 }
 
+//Função para recuperar as coordenadas de um usuário com base no seu endereço 
+const getCoordenadas = async (numero, rua, cidade, uf) => {
+
+    try {
+
+        const { data } = await axios.get(
+            `https://nominatim.openstreetmap.org/search`,
+            {
+                params: {
+                    street: `${numero} ${rua}`,
+                    city: cidade,
+                    state: uf,
+                    country: 'Brasil',
+                    countrycodes: 'br',
+                    format: 'json',
+                    limit: 1
+                }
+            }
+        )
+        
+        if (data) { //Se o endereço for localizado, retona as coordenadas, se não, retorna um array vazio
+            return (data.length > 0) ? [data[0].lat, data[0].lon] : []
+        }
+
+    } catch(err) {
+        throw err;
+    }
+
+}
+
+//Rota para atribuir as informações sobre do localização usuário
+const atribuirCoordenadas = async (req, res) => {
+
+    const user = await Usuario.findOne({cpfCnpj: req.body.cpfCnpj});
+
+    if ( user && ['Instituição', 'Comércio'].includes(user.tipo) ) {
+
+        const coordenadas = await getCoordenadas(
+            req.body.numero, 
+            req.body.rua, 
+            req.body.cidade, 
+            req.body.uf, 
+        )
+
+        if ( coordenadas.length > 0 ) { //Verificando se o endereço foi passado corretamente
+
+            user.cidade = req.body.cidade;
+            user.uf = req.body.uf;
+            user.bairro = req.body.bairro;
+            user.rua = req.body.rua;
+            user.numero = req.body.numero;
+            user.complemento = req.body.complemento;
+            user.latitude = coordenadas[0];
+            user.longitude = coordenadas[1];
+
+            try {
+
+                await user.save();
+                res.status(200).json({message: 'Localização atribuida com sucesso !'})
+
+            } catch (err) {
+                res.status(400).json({error: err});
+            }
+
+        } else {//Caso o endereço seja invalido:
+            res.status(400).json({error: 'Endereço invalido !'})
+        }
+
+    } else { //Usuário não encontrado !
+        res.status(404).json({error: 'Desculpe, esse usuário não existe ou não é do tipo Comércio ou Instituição !'})
+    }
+
+}
+
+
 
 module.exports = {
     inserirUsuario,
     removerUsuario,
     atualizarUsuario,
     listarUsuarios,
-    loginUsuarios
+    loginUsuarios,
+    atribuirCoordenadas
 }

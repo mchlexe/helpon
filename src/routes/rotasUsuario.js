@@ -14,5 +14,6 @@ router.delete('/remover', usuarioController.removerUsuario)
 router.put('/atualizar', usuarioController.atualizarUsuario)
 router.get('/listar', usuarioController.listarUsuarios)
 router.post('/login', usuarioController.loginUsuarios)
+router.put('/coordenadas', usuarioController.atribuirCoordenadas)
 
 module.exports = router;
