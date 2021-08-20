@@ -152,7 +152,10 @@ const removerUsuario = (req, res) => {
 
 
 const atualizarUsuario = (req, res) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> aa44600626b4ad573b94b720c69483ce9a625bf1
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
