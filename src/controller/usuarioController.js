@@ -8,6 +8,8 @@ const jwt = require('jsonwebtoken')
 const SECRET = 'helpontolls'
 const yup = require('yup')
 const axios = require('axios').default
+const { unlink } = require('fs') //Metodo que remove arquivos
+const { join } = require('path')
 
 let schema = yup.object().shape({
     cpfCnpj: yup.string().required(),
@@ -19,6 +21,17 @@ let schema = yup.object().shape({
     tipo: yup.string().required()
 })
 
+
+const deletarImagem = (nomeDoArquivo) => {
+
+    const caminhoImagem = join(__dirname, '../../uploads', nomeDoArquivo)
+
+    unlink(caminhoImagem, (err) => {
+        if (err) throw err;
+        console.log(`A imagem foi apagada com sucesso !`)
+    })
+
+}
 
 const inserirUsuario = (req, res) => {
 
@@ -36,7 +49,11 @@ const inserirUsuario = (req, res) => {
         .then((user, err) => {
 
             if (user) {
+
                 res.status(400).json({ message: 'CPF/CNPJ já cadastrado!' })
+                //Deletando a imagem que foi salva:
+                deletarImagem(req.file.filename)
+
             }
 
             else {
@@ -81,6 +98,10 @@ const inserirUsuario = (req, res) => {
                         res.status(200).json({ message: 'Usuário inserido com sucesso !' })
                     })
                     .catch((err) => {
+
+                        //Apagando a imagem 
+                        deletarImagem(req.file.filename)
+
                         res.status(400).json({
                             erro: err
                         })
@@ -131,7 +152,7 @@ const removerUsuario = (req, res) => {
 
 
 const atualizarUsuario = (req, res) => {
-    vecificajwt();
+
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
