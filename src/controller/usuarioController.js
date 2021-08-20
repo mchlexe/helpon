@@ -131,7 +131,6 @@ const removerUsuario = (req, res) => {
 
 
 const atualizarUsuario = (req, res) => {
-    vecificajwt();
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
