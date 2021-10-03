@@ -19,25 +19,25 @@ let schema = yup.object().shape({
     email: yup.string().email().required(),
     senha: yup.string().required(),
     tipo: yup.string().required()
-})
+}) 
 
 
 const deletarImagem = (nomeDoArquivo) => {
 
     const caminhoImagem = join(__dirname, '../../uploads', nomeDoArquivo)
 
-    unlink(caminhoImagem, (err) => {
-        if (err) throw err;
+    unlink(caminhoImagem, (err) => { 
+        if (err) throw err; 
         console.log(`A imagem foi apagada com sucesso !`)
     })
-
-}
+ 
+} 
 
 const inserirUsuario = (req, res) => {
-
-    schema.isValid({
+ 
+    schema.isValid({  
         cpfCnpj: req.body.cpfCnpj,
-        fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
+        fotoPerfil: (req.file) ? `http://${process.env.ENDERECO_IP}:3000/uploads/${req.file.filename}` : `http://${process.env.ENDERECO_IP}:3000/uploads/userDefaultImage.jpg`,
         nome: req.body.nome,
         telefone: req.body.telefone,
         email: req.body.email,
@@ -98,7 +98,7 @@ const inserirUsuario = (req, res) => {
                         res.status(200).json({ message: 'Usuário inserido com sucesso !' })
                     })
                     .catch((err) => {
-
+                        
                         //Apagando a imagem 
                         deletarImagem(req.file.filename)
 
@@ -152,10 +152,7 @@ const removerUsuario = (req, res) => {
 
 
 const atualizarUsuario = (req, res) => {
-<<<<<<< HEAD
 
-=======
->>>>>>> aa44600626b4ad573b94b720c69483ce9a625bf1
     Usuario.findOne({ cpfCnpj: req.body.cpfCnpj })
         .then((user, err) => {
 
