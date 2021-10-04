@@ -36,7 +36,9 @@ const inserirCupom = async (req, res) => {
         const novoCupom = {
 
             autor: autor._id,
+            autorNome: autor.nome,
             instituicaoAlvo: instituicaoAlvo._id,
+            instituicaoAlvoNome: instituicaoAlvo.nome,
             data_validade: req.body.data_validade,
             descricao: req.body.descricao,
             valor_doado: req.body.valor_doado,
@@ -119,9 +121,35 @@ const listarCupons = (req, res) => {
         .then((cupons) => {
             return res.end(JSON.stringify(cupons))
         }).catch((err) => {
-            rest.status(500).json({
+            res.status(500).json({
                 erro: err,
                 message: 'Falha interna ao procurar cupons!'
+            })
+        })
+}
+
+const listarPorStatusCupons = (req, res) => {
+
+    Cupom.find({status: req.param('status')}).lean()
+        .then((cupons) => {
+            return res.end(JSON.stringify(cupons))
+        }).catch((err) => {
+            res.status(500).json({
+                erro: err,
+                message: 'Falha interna ao procurar cupons!'
+            })
+        })
+}
+
+const listarCupom = (req, res) => {
+
+    Cupom.find({id: req.param('id')}).lean()
+        .then((cupons) => {
+            return res.end(JSON.stringify(cupons))
+        }).catch((err) => {
+            rest.status(500).json({
+                erro: err,
+                message: 'Falha interna ao procurar cupom!'
             })
         })
 }
@@ -130,5 +158,7 @@ const listarCupons = (req, res) => {
 module.exports = {
     inserirCupom,
     atualizarCupom,
-    listarCupons
+    listarCupons,
+    listarPorStatusCupons,
+    listarCupom
 }
