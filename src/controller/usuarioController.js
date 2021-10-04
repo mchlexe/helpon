@@ -160,10 +160,12 @@ const atualizarUsuario = (req, res) => {
 
                 if(req.body['cupons']){
                     // comprar
-                    // {
-                    //     "cpfCnpj": "12312",
-                    //     "cupons": {"id": 12,"status": true}
-                    // }
+                    //{
+                    //  "cpfCnpj": "10922734587",
+                    //  "cupons": {"id": 29,
+                    //  "descricao": "Cupom #2",
+                    //  "status": true}
+                    //}
                     // { utilizar
                     //     "cpfCnpj": "12312",
                     //     "cupons": {"id": 12,"status": true}

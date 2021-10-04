@@ -14,9 +14,15 @@ const cupomSchema = new Schema({
     autorNome: {
         type: String
     },
+    autorCnpj: {
+        type: String
+    },
     instituicaoAlvo: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario'
+    },
+    instituicaoAlvoCnpj: {
+        type: String
     },
     instituicaoAlvoNome: {
         type: String

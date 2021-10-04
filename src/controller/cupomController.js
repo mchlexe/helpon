@@ -37,8 +37,10 @@ const inserirCupom = async (req, res) => {
 
             autor: autor._id,
             autorNome: autor.nome,
+            autorCnpj: autor.cpfCnpj,
             instituicaoAlvo: instituicaoAlvo._id,
             instituicaoAlvoNome: instituicaoAlvo.nome,
+            instituicaoCnpj: instituicaoAlvo.cpfCnpj,
             data_validade: req.body.data_validade,
             descricao: req.body.descricao,
             valor_doado: req.body.valor_doado,
