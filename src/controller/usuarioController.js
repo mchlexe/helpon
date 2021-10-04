@@ -63,7 +63,7 @@ const inserirUsuario = (req, res) => {
 
                 let novoUsuario = {
                     cpfCnpj: req.body.cpfCnpj,
-                    fotoPerfil: (req.file) ? `http://localhost:3000/uploads/${req.file.filename}` : 'http://localhost:3000/uploads/userDefaultImage.jpg',
+                    fotoPerfil: (req.file) ? `http://${process.env.ENDERECO_IP}:3000/uploads/${req.file.filename}` : `http://${process.env.ENDERECO_IP}:3000/uploads/userDefaultImage.jpg`,
                     nome: req.body.nome,
                     telefone: req.body.telefone,
                     email: req.body.email,
@@ -240,7 +240,12 @@ const loginUsuarios =(req, res) =>{
             //login.senha == user.senha
            if (bcrypt.compareSync(login.senha, user.senha)){
                const token = jwt.sign({userId: user._id}, SECRET, { expiresIn:14400})
-               return res.json({auth: true, token});
+               return res.json(
+                    {
+                       token, 
+                       user
+                    }
+                   );
             }
             else{
                 res.status(401).json({ message: 'Senha incorreta!' });
