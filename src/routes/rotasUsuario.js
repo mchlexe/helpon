@@ -12,7 +12,7 @@ const usuarioController = require('../controller/usuarioController')
 router.post('/inserir', upload.single('profilePicture'), usuarioController.inserirUsuario)
 router.delete('/remover', usuarioController.removerUsuario)
 router.put('/atualizar', usuarioController.atualizarUsuario)
-router.get('/listar', usuarioController.listarUsuarios)
+router.post('/listar', usuarioController.listarUsuarios)
 router.post('/login', usuarioController.loginUsuarios)
 router.put('/coordenadas', usuarioController.atribuirCoordenadas)
 

@@ -186,6 +186,12 @@ const atualizarUsuario = (req, res) => {
                     req.body['cupons'] = string_cupons
                 }
 
+
+                if ( req.body['senha'] ) {
+                    const hash = bcrypt.hashSync(req.body.senha, 10);
+                    req.body['senha'] = hash;
+                }
+
                 Usuario.updateOne({ cpfCnpj: req.body.cpfCnpj }, req.body)
                     .then(() => {
                         res.status(200).json({ message: 'Usuario atualizado com sucesso!' });
@@ -215,7 +221,6 @@ const listarUsuarios = (req, res) => {
 
     jwt.verify(token, SECRET, (err, decoded) => {
         if(err) return res.status(401).json({ message: 'Token inválido' }).end;
-
         req.userId = decoded.userId;
     })
     Usuario.find(req.body).lean()
@@ -239,6 +244,7 @@ const loginUsuarios =(req, res) =>{
             //bcrypt.compareSync(password, hash);
             //login.senha == user.senha
            if (bcrypt.compareSync(login.senha, user.senha)){
+               
                const token = jwt.sign({userId: user._id}, SECRET, { expiresIn:14400})
                return res.json(
                     {
@@ -312,8 +318,8 @@ const atribuirCoordenadas = async (req, res) => {
             user.rua = req.body.rua;
             user.numero = req.body.numero;
             user.complemento = req.body.complemento;
-            user.latitude = coordenadas[0];
-            user.longitude = coordenadas[1];
+            user.latitude = parseFloat(coordenadas[0]);
+            user.longitude = parseFloat(coordenadas[1]);
 
             try {
 

@@ -71,10 +71,10 @@ const usuarioSchema = new Schema({//Criando a estrutura do documento
         type: Array
     },
     latitude: {
-        type: String
+        type: Number
     },
     longitude: {
-        type: String
+        type: Number
     }
 
 })
